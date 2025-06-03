@@ -25,7 +25,13 @@ function render(filter = "") {
       row.innerHTML = `
         <td>${book.title}</td>
         <td>${book.author}</td>
-        <td><button class="delete" data-id="${book.id}">Delete</button></td>
+        <td>${book.issued ? "Issued" : "Available"}</td>
+        <td>
+          <button class="issue" data-id="${book.id}">
+            ${book.issued ? "Return" : "Issue"}
+          </button>
+          <button class="delete" data-id="${book.id}">Delete</button>
+        </td>
       `;
 
       list.appendChild(row);
@@ -35,6 +41,20 @@ function render(filter = "") {
     btn.addEventListener("click", e => {
       const id = e.target.getAttribute("data-id");
       books = books.filter(book => book.id !== id);
+      save();
+      render(search.value);
+    })
+  );
+
+  document.querySelectorAll(".issue").forEach(btn =>
+    btn.addEventListener("click", e => {
+      const id = e.target.getAttribute("data-id");
+      for (let i = 0; i < books.length; i++) {
+        if (books[i].id === id) {
+          books[i].issued = !books[i].issued;
+          break;
+        }
+      }
       save();
       render(search.value);
     })
@@ -51,7 +71,8 @@ form.addEventListener("submit", function (e) {
     books.push({
       id: Date.now().toString(),
       title,
-      author
+      author,
+      issued: false
     });
 
     save();
